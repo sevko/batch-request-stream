@@ -1,0 +1,26 @@
+{
+	"name": "batch-request-stream",
+	"version": "0.0.0",
+	"description": "Make batched (and optionally rate-limited) requests for data flowing through a stream.",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/sevko/batch-request-stream"
+	},
+	"keywords": [
+		"stream",
+		"batch",
+		"request",
+		"async",
+		"rate-limit"
+	],
+	"author": "Severyn Kozak <severyn.kozak@gmail.com> (http://sevko.io/)",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/sevko/batch-request-stream/issues"
+	},
+	"homepage": "https://github.com/sevko/batch-request-stream"
+}
