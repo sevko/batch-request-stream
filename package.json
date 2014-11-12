@@ -1,10 +1,10 @@
 {
 	"name": "batch-request-stream",
-	"version": "0.0.0",
+	"version": "0.1.0",
 	"description": "Make batched (and optionally rate-limited) requests for data flowing through a stream.",
 	"main": "index.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "node test/test.js | node_modules/.bin/tap-spec"
 	},
 	"repository": {
 		"type": "git",
@@ -17,8 +17,12 @@
 		"async",
 		"rate-limit"
 	],
+	"devDependencies": {
+		"tap-spec": "^1.0.1",
+		"tape": "^2.13.4"
+	},
 	"author": "Severyn Kozak <severyn.kozak@gmail.com> (http://sevko.io/)",
-	"license": "ISC",
+	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/sevko/batch-request-stream/issues"
 	},

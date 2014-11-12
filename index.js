@@ -2,17 +2,20 @@
 
 var stream = require("stream");
 
-function createStream(request, batchSize, maxLiveRequests){
+function createStream(request, batchSize, maxLiveRequests, streamOptions){
 	var batchSize = batchSize || 100;
 	var batch = [];
 
 	var maxLiveRequests = maxLiveRequests || 100;
 	var liveRequests = 0;
 
+	/**
+	 * @TODO: Integrate streamEnded.
+	 */
 	var streamEnded = false;
 	var streamPaused = false;
 
-	var writeStream = new stream.Writable();
+	var writeStream = new stream.Writable(streamOptions);
 
 	function requestCompleted(){
 		writeStream.emit("requestCompleted");
