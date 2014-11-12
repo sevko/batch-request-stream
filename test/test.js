@@ -1,5 +1,5 @@
 /**
- * @file TAP unit-tests for the `/index.js` module.
+ * @file TAP unit-tests for the `../index` module.
  */
 
 "use strict";
@@ -7,6 +7,11 @@
 var createBatchRequestStream = require("../index");
 var tap = require("tape");
 
+/**
+ * Test whether `createBatchRequestStream()` is buffering the correct number of
+ * items per request, by checking the length of the `buffer` argument passed to
+ * the `request()` callback.
+ */
 tap("Test batch-sizes.", function callback(test){
 	var batchSize = 4;
 	var numItems = batchSize * 5;
@@ -25,11 +30,20 @@ tap("Test batch-sizes.", function callback(test){
 	test.end();
 });
 
+/**
+ * Test whether `createBatchRequestStream()` is keeping less than
+ * `maxLiveRequests` requests open at any given time, by keeping internal
+ * counters that are incremented and decremented by the `request()` callback.
+ */
 tap("Test rate-limiting.", function callback(test){
 	var batchSize = 4;
 	var numItems = batchSize * 5;
+
+	// Used to test rate-limiting in `request()`.
 	var numLiveRequests = 0;
 	var maxLiveRequests = 2;
+
+	// Used to call `test.end()` when the last request has been sent.
 	var sumRequests = 0;
 
 	function request(batch, requestCompleted){
@@ -39,6 +53,8 @@ tap("Test rate-limiting.", function callback(test){
 			numLiveRequests <= maxLiveRequests,
 			"Number of live requests less than maxLiveRequests."
 		);
+
+		// Simulate an async I/O request.
 		setTimeout(function handleRequest(){
 			numLiveRequests--;
 			requestCompleted();
