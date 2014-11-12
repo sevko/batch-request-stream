@@ -1,6 +1,6 @@
 {
 	"name": "batch-request-stream",
-	"version": "0.2.0",
+	"version": "1.0.0",
 	"description": "Make batched, rate-limited requests for data flowing through a stream.",
 	"main": "index.js",
 	"scripts": {

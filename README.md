@@ -1,5 +1,11 @@
+[![Build Status](https://travis-ci.org/sevko/batch-request-stream.svg?branch=master)](https://travis-ci.org/sevko/batch-request-stream)
+
+[![NPM](https://nodei.co/npm/batch-request-stream.png)](https://nodei.co/npm/batch-request-stream/)
+
 # batch request stream
-Make batched and rate-limited requests for data flowing through a node.js Stream.
+Make batched and rate-limited requests for data flowing through a node.js Stream; useful when you need to make
+slow, asynchronous I/O calls (which are optimally batched) for items coming down a fast read stream, and don't want to
+throttle the responding service.
 
 ## api
 The package exports a single function which will create and return a `Writable` stream.
