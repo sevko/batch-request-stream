@@ -1,27 +1,53 @@
+/**
+ * @file Exports a function that creates a Writable stream that buffers and
+ * rate-limits asynchronous requests.
+ */
+
 "use strict";
 
 var stream = require("stream");
 
+/**
+ * Create a buffered, rate-limited Writable Stream.
+ *
+ * @param {function(batch, requestCompleted)} request The function to execute
+ *      on each buffered batch of data. Must accept two arguments:
+ *
+ *          {array} batch An array of objects written to the Stream. Will be of
+ *          length `batchSize` unless it's the last and the number of objects
+ *          sent in is not evenly divisible by `batchSize`.
+ *
+ *          {function} requestCompleted Must be called by the callback sent to
+ *          the asynchronous request made by `request()`. This is used to track
+ *          the number of live concurrent requests, and thus manage
+ *          rate-limiting.
+ *
+ * @param {int} [batchSize=100] The number of items in each batch.
+ * @param {int} [maxLiveRequests=100] The maximum number of incomplete requests
+ *      to keep open at any given time.
+ * @param {Object} streamOptions Options sent to `stream.Writable()`; for
+ *      example: `{objectMode: true}`.
+ */
 function createStream(request, batchSize, maxLiveRequests, streamOptions){
+	var writeStream = new stream.Writable(streamOptions);
+
 	var batchSize = batchSize || 100;
 	var batch = [];
 
-	var maxLiveRequests = maxLiveRequests || 100;
+	// Used to rate-limit the number of open requests.
 	var liveRequests = 0;
-
-	/**
-	 * @TODO: Integrate streamEnded.
-	 */
-	var streamEnded = false;
+	var maxLiveRequests = maxLiveRequests || 100;
 	var streamPaused = false;
 
-	var writeStream = new stream.Writable(streamOptions);
-
+	/**
+	 * Signals the completion of a request. Used to decrement `liveRequests`
+	 * and manage rate-limiting.
+	 */
 	function requestCompleted(){
 		writeStream.emit("requestCompleted");
 	}
 
-	writeStream.on("requestCompleted", function requestCompleted(){
+	writeStream.on("requestCompleted", function updateLiveRequests(){
 		liveRequests--;
 		if(streamPaused && liveRequests < maxLiveRequests){
 			streamPaused = false;
@@ -48,6 +74,13 @@ function createStream(request, batchSize, maxLiveRequests, streamOptions){
 			next();
 		}
 	};
+
+	writeStream.on("finish", function (){
+		if(batch.length > 0){
+			request(batch, requestCompleted);
+		}
+	});
+
 	return writeStream;
 }
 
