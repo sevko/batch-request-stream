@@ -25,8 +25,8 @@ var stream = require("stream");
  * @param {int} [batchSize=100] The number of items in each batch.
  * @param {int} [maxLiveRequests=100] The maximum number of incomplete requests
  *      to keep open at any given time.
- * @param {Object} streamOptions Options sent to `stream.Writable()`; for
- *      example: `{objectMode: true}`.
+ * @param {Object} [streamOptions] Options sent to `stream.Writable()`;
+ *      for example: `{objectMode: true}`.
  */
 function createStream(request, batchSize, maxLiveRequests, streamOptions){
 	var writeStream = new stream.Writable(streamOptions);
