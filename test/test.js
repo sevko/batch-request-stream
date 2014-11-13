@@ -21,9 +21,12 @@ tap("Test batch-sizes.", function callback(test){
 		requestCompleted();
 	}
 
-	var batchRequestStream = new createBatchRequestStream(
-		request, batchSize, 2, {objectMode: true}
-	);
+	var batchRequestStream = new createBatchRequestStream({
+		request: request,
+		batchSize: batchSize,
+		maxLiveRequests: 2,
+		streamOptions: {objectMode: true}
+	});
 	for(var num = 0; num < numItems; num++){
 		batchRequestStream.write(num);
 	}
@@ -64,9 +67,12 @@ tap("Test rate-limiting.", function callback(test){
 		}, 100);
 	}
 
-	var batchRequestStream = new createBatchRequestStream(
-		request, batchSize, maxLiveRequests, {objectMode: true}
-	);
+	var batchRequestStream = new createBatchRequestStream({
+		request: request,
+		batchSize: batchSize,
+		maxLiveRequests: maxLiveRequests,
+		streamOptions: {objectMode: true}
+	});
 
 	for(var num = 0; num < numItems; num++){
 		batchRequestStream.write(num);

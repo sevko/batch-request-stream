@@ -10,8 +10,10 @@ throttle the responding service.
 ## api
 The package exports a single function which will create and return a `Writable` stream.
 
-`createBatchRequestStream(request, batchSize, maxLiveRequests, streamOptions)`
+`createBatchRequestStream(options)`
 
+  * `options` is a configuration object which must contain the following mandatory keys and may contain the optional
+   ones:
   * `request(batch, requestCompleted)`: The function to execute on each buffered batch of data. Must accept two
    arguments: `batch`, an array of the objects written to the stream, and `requestCompleted`, a function that *must* be
    called by whatever callback is sent to the asynchronous I/O function called inside `request()`; see the example for
@@ -20,7 +22,8 @@ The package exports a single function which will create and return a `Writable` 
    stream has ended and a non-empty batch remains (because the total number of items written isn't evenly divisible by
    `batchSize`), it'll still be sent to `request()`.
   * `maxLiveRequests` (**optional**, default value: `100`): The maximum number of concurrent requests to keep open.
-  * `streamOptions` (**optional**): Options to pass to `new stream.Writable()`.
+  * `streamOptions` (**optional**): [Options](http://nodejs.org/api/stream.html#stream_new_stream_writable_options)
+   to pass to `new stream.Writable()`.
 
 ## example
 
@@ -29,17 +32,14 @@ var createBatchRequestStream = require("batch-request-stream");
 
 function request(batch, requestCompleted){
 	asyncIORequest(batch, function callback(err){
-		 // must be called, else no requests past `maxLiveRequests` will be sent.
-		requestCompleted();
+		requestCompleted(); // MUST be called
 	});
 }
 
-var batchRequestStream = createBatchRequestStream(
-	request,
-	null, // default: 100
-	null, // default: 100
-	{objectMode: true} // if you need to write objects
-);
+var batchRequestStream = createBatchRequestStream({
+	request: request,
+	streamOptions: {objectMode: true}
+});
 
 fastReadStream.pipe(batchRequestStream);
 ```

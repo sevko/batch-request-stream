@@ -10,8 +10,12 @@ var stream = require("stream");
 /**
  * Create a buffered, rate-limited Writable Stream.
  *
- * @param {function(batch, requestCompleted)} request The function to execute
- *      on each buffered batch of data. Must accept two arguments:
+ * @param options Configuration object, which must contain the following
+ *      mandatory keys and may contain the optional ones (note JSDoc `[]`
+ *      syntax for optional values).
+ *
+ *      {function(batch, requestCompleted)} request The function to execute
+ *          on each buffered batch of data. Must accept two arguments:
  *
  *          {array} batch An array of objects written to the Stream. Will be of
  *          length `batchSize` unless it's the last and the number of objects
@@ -22,21 +26,21 @@ var stream = require("stream");
  *          the number of live concurrent requests, and thus manage
  *          rate-limiting.
  *
- * @param {int} [batchSize=100] The number of items in each batch.
- * @param {int} [maxLiveRequests=100] The maximum number of incomplete requests
- *      to keep open at any given time.
- * @param {Object} [streamOptions] Options sent to `stream.Writable()`;
- *      for example: `{objectMode: true}`.
+ *      {int} [batchSize=100] The number of items in each batch.
+ *      {int} [maxLiveRequests=100] The maximum number of incomplete requests
+ *          to keep open at any given time.
+ *      {Object} [streamOptions] Options sent to `stream.Writable()`;
+ *          for example: `{objectMode: true}`.
  */
-function createStream(request, batchSize, maxLiveRequests, streamOptions){
-	var writeStream = new stream.Writable(streamOptions);
+function createStream(options){
+	var writeStream = new stream.Writable(options.streamOptions);
 
-	var batchSize = batchSize || 100;
+	var batchSize = options.batchSize || 100;
 	var batch = [];
 
 	// Used to rate-limit the number of open requests.
 	var liveRequests = 0;
-	var maxLiveRequests = maxLiveRequests || 100;
+	var maxLiveRequests = options.maxLiveRequests || 100;
 	var streamPaused = false;
 
 	/**
@@ -59,25 +63,21 @@ function createStream(request, batchSize, maxLiveRequests, streamOptions){
 		batch.push(data);
 		if(batch.length == batchSize){
 			liveRequests++;
-			request(batch, requestCompleted);
+			options.request(batch, requestCompleted);
 			batch = [];
 
 			if(liveRequests >= maxLiveRequests){
 				streamPaused = true;
 				this.once("resumeStream", next);
-			}
-			else {
-				next();
+				return;
 			}
 		}
-		else {
-			next();
-		}
+		next();
 	};
 
 	writeStream.on("finish", function (){
 		if(batch.length > 0){
-			request(batch, requestCompleted);
+			options.request(batch, requestCompleted);
 		}
 	});
 
