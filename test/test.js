@@ -15,6 +15,7 @@ var tap = require("tape");
 tap("Test batch-sizes.", function callback(test){
 	var batchSize = 4;
 	var numItems = batchSize * 5;
+	test.plan(5);
 
 	function request(batch, requestCompleted){
 		test.equal(batch.length, batchSize, "Batch size matches.");
@@ -30,7 +31,6 @@ tap("Test batch-sizes.", function callback(test){
 	for(var num = 0; num < numItems; num++){
 		batchRequestStream.write(num);
 	}
-	test.end();
 });
 
 /**
@@ -41,6 +41,7 @@ tap("Test batch-sizes.", function callback(test){
 tap("Test rate-limiting.", function callback(test){
 	var batchSize = 4;
 	var numItems = batchSize * 5;
+	test.plan(5);
 
 	// Used to test rate-limiting in `request()`.
 	var numLiveRequests = 0;
@@ -61,9 +62,6 @@ tap("Test rate-limiting.", function callback(test){
 		setTimeout(function handleRequest(){
 			numLiveRequests--;
 			requestCompleted();
-			if(currRequestNum == numItems / batchSize){
-				test.end();
-			}
 		}, 100);
 	}
 
