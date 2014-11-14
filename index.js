@@ -5,7 +5,7 @@
 
 "use strict";
 
-var stream = require("stream");
+var stream = require("readable-stream");
 
 /**
  * Create a buffered, rate-limited Writable Stream.

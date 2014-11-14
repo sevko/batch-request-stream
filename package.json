@@ -26,5 +26,8 @@
 	"bugs": {
 		"url": "https://github.com/sevko/batch-request-stream/issues"
 	},
-	"homepage": "https://github.com/sevko/batch-request-stream"
+	"homepage": "https://github.com/sevko/batch-request-stream",
+	"dependencies": {
+		"readable-stream": "^1.0.33"
+	}
 }
