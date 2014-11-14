@@ -38,6 +38,8 @@ function request(batch, requestCompleted){
 
 var batchRequestStream = createBatchRequestStream({
 	request: request,
+	batchSize: 4,
+	maxLiveRequests: 3,
 	streamOptions: {objectMode: true}
 });
 
